@@ -1,8 +1,9 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
 import ExpensesList from './ExpensesList'
 import ExpensesSummary from './ExpensesSummary'
+import Retry from './Retry'
 
-export default function ExpensesOutput({
+export default function ExpensesOutput({ isPending, isError,
   expenses,
   expensesPeriod, listHeading }) {
 
@@ -12,7 +13,7 @@ export default function ExpensesOutput({
       periodName={expensesPeriod} />
     <View style={styles.expensesContainer} >
       <Text style={styles.listHeading}>{listHeading}</Text>
-      <ExpensesList expenses={expenses} />
+      {isPending ? <ActivityIndicator /> : isError ? <Retry error={isError} /> : <ExpensesList expenses={expenses} />}
     </View>
   </View>
 }

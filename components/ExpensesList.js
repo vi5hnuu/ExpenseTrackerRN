@@ -2,9 +2,9 @@ import { View, Text, FlatList, StyleSheet } from 'react-native'
 import React from 'react'
 import ExpenseItem from './ExpenseItem'
 import EmptyItem from './EmptyItem'
+import { useSelector } from 'react-redux'
 
 export default function ExpensesList({ expenses }) {
-
 
   return <FlatList
     data={expenses}

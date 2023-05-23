@@ -8,13 +8,20 @@ import AllExpenses from './screens/AllExpenses';
 import { Entypo } from '@expo/vector-icons';
 import { Fontisto } from '@expo/vector-icons';
 import IconButton from './components/IconButton';
-import { Provider } from 'react-redux';
+import { Provider, useDispatch, useSelector } from 'react-redux';
 import { store } from './store/Store';
+import { thunks } from './store/expensesSlice';
+import { useEffect } from 'react';
 
 const Stack = createNativeStackNavigator();
 const BottomTaps = createBottomTabNavigator()
 
 function ExpensesOverview() {
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(thunks.initilizeExpenses)
+  }, [])
+
   return <BottomTaps.Navigator
     screenOptions={({ navigation }) => {
       return {
@@ -64,6 +71,7 @@ function ExpensesOverview() {
   </BottomTaps.Navigator>
 }
 export default function App() {
+
   return <Provider store={store}>
     <StatusBar style='light' />
     <NavigationContainer>
