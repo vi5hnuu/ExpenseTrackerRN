@@ -32,6 +32,16 @@ const slice = createSlice({
     deleteExpense: (state, action) => {
       const id = action.payload.id
       state.expenses = state.expenses.filter(expense => expense.id !== id)
+      state.pending = false;
+      state.error = null;
+    },
+    deleteExpensePending: (state, action) => {
+      state.pending = true;
+      state.error = null;
+    },
+    deleteExpenseRejected: (state, action) => {
+      state.pending = false;
+      state.error = action.payload.error;
     },
     updateExpense: (state, action) => {
       const id = action.payload.id
@@ -85,17 +95,28 @@ function updateExpenseThunk(expense) {
     dispatch(slice.actions.updateExpensePending())
     try {
       await axios.patch(`https://expensetrackerrn-1f2ae-default-rtdb.firebaseio.com/expenses/${expense.id}.json`, { ...expense, id: null })
-      setTimeout(() => {
-        dispatch(slice.actions.updateExpense({ ...expense, date: new Date(expense.date) }))//Todo : check functionality again
-      }, 2000)
+      dispatch(slice.actions.updateExpense({ ...expense, date: new Date(expense.date) }))
     } catch (error) {
       dispatch(slice.actions.updateExpenseRejected({ error: error.toString() }))
+    }
+  }
+}
+function deleteExpenseThunk(id) {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.deleteExpensePending())
+    try {
+      await axios.delete(`https://expensetrackerrn-1f2ae-default-rtdb.firebaseio.com/expenses/${id}.json`)
+      setTimeout(() => {
+        dispatch(slice.actions.deleteExpense({ id }))
+      }, 2000)
+    } catch (error) {
+      dispatch(slice.actions.deleteExpenseRejected({ error: error.toString() }))
     }
   }
 }
 
 
 
-export const thunks = { initilizeExpenses, addExpenseThunk, updateExpenseThunk }
+export const thunks = { initilizeExpenses, addExpenseThunk, updateExpenseThunk, deleteExpenseThunk }
 export default slice
 export const actions = slice.actions

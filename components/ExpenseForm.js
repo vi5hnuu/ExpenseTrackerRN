@@ -74,9 +74,7 @@ export default function ExpenseForm() {
     navigation.goBack();
   }
   function expenseDeleteHandler() {
-    // console.log(expenseActions.deleteExpense({ id }));
-    dispatch(expenseActions.deleteExpense({ id }))
-    navigation.goBack();
+    dispatch(thunks.deleteExpenseThunk(id))
   }
 
   return <View style={styles.form}>
@@ -118,12 +116,12 @@ export default function ExpenseForm() {
         Cancel
       </Button>
     </View>
-    {id && <IconButton
+    {id && !expenseSlice.pending ? <IconButton
       onPress={expenseDeleteHandler}
       style={styles.iconButton}
       name='trash'
       color='#f00'
-      size={24} />}
+      size={24} /> : expenseSlice.error ? <Retry onRetry={onRetryHandler} error={expenseSlice.error} /> : <ActivityIndicator style={{ marginTop: 15 }} />}
   </View>
 }
 
