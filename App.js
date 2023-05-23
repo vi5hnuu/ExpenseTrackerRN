@@ -22,6 +22,7 @@ function ExpensesOverview() {
     dispatch(thunks.initilizeExpenses)
   }, [])
 
+
   return <BottomTaps.Navigator
     screenOptions={({ navigation }) => {
       return {

@@ -54,8 +54,7 @@ export default function ExpenseForm() {
       Alert.alert('Invalid data', `Please enter a valid value :\nUsage : \n\tDate: YYYY-MM-DD and <=${getDate(new Date())}\n\tAmount: >0\n\tDescription: >0`, [{ style: 'destructive' }])
       return
     }
-    dispatch(expenseActions.updateExpense({ id, description, date: new Date(date), amount: +amount }))
-    navigation.goBack();
+    dispatch(thunks.updateExpenseThunk({ id, description, date: date, amount: +amount }))
   }
   function expenseAddHandler() {
     if (!isFormValid()) {
@@ -65,7 +64,11 @@ export default function ExpenseForm() {
     dispatch(thunks.addExpenseThunk({ description, date: date, amount: +amount }))
   }
   function onRetryHandler() {
-    dispatch(thunks.addExpenseThunk({ description, date: date, amount: +amount }))
+    if (id) {
+      dispatch(thunks.updateExpenseThunk({ id, description, date: date, amount: +amount }))
+    } else {
+      dispatch(thunks.addExpenseThunk({ description, date: date, amount: +amount }))
+    }
   }
   function expenseCancelHandler() {
     navigation.goBack();

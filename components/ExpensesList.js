@@ -6,6 +6,9 @@ import { useSelector } from 'react-redux'
 
 export default function ExpensesList({ expenses }) {
 
+  function refreshListHandler() {
+    console.log('refresh');
+  }
   return <FlatList
     data={expenses}
     keyExtractor={(expense) => expense.id}
