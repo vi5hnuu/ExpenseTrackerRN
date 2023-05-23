@@ -17,8 +17,17 @@ const slice = createSlice({
       state.error = action.payload.error;
     },
     addExpense: (state, action) => {
-      const { description, date, amount } = action.payload
-      state.expenses.push({ id: Math.random(), description, date, amount })
+      state.pending = false;
+      state.error = false;
+      state.expenses.push(action.payload)
+    },
+    addExpensePending: (state, action) => {
+      state.pending = true;
+      state.error = null;
+    },
+    addExpenseRejected: (state, action) => {
+      state.pending = false;
+      state.error = action.payload.error;
     },
     deleteExpense: (state, action) => {
       const id = action.payload.id
@@ -30,7 +39,7 @@ const slice = createSlice({
       const uExpenses = [...state.expenses]
       uExpenses[exExpenseIdx] = { ...state.expenses[exExpenseIdx], ...action.payload }
       state.expenses = uExpenses
-    }
+    },
   }
 })
 //thunks
@@ -44,16 +53,41 @@ async function initilizeExpenses(dispatch, getState) {
       expense.date = new Date(expense.date)
       expenses.push(expense)
     }
-    setTimeout(() => {
-      dispatch(slice.actions.init({ expenses }))
-    }, 2000)
+    dispatch(slice.actions.init({ expenses }))
   } catch (error) {
     dispatch(slice.actions.initRejected({ error: error.toString() }))
   }
 }
 
+function addExpenseThunk(expense) {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.addExpensePending())
+    try {
+      const { name } = await axios.post('https://expensetrackerrn-1f2ae-default-rtdb.firebaseio.com/expenses.json', expense)
+      setTimeout(() => {
+        dispatch(slice.actions.addExpense({ id: name, ...expense, date: new Date(expense.date) }))
+      }, 2000)
+    } catch (error) {
+      dispatch(slice.actions.addExpenseRejected({ error: error.toString() }))
+    }
+  }
+}
+function updateExpenseThunk(expense) {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.updateExpensePending())
+    try {
+      const { name } = await axios.post('https://expensetrackerrn-1f2ae-default-rtdb.firebaseio.com/expenses.json', expense)
+      setTimeout(() => {
+        dispatch(slice.actions.updateExpense({ id: name, ...expense, date: new Date(expense.date) }))
+      }, 2000)
+    } catch (error) {
+      dispatch(slice.actions.updateExpenseRejected({ error: error.toString() }))
+    }
+  }
+}
 
 
-export const thunks = { initilizeExpenses }
+
+export const thunks = { initilizeExpenses, addExpenseThunk }
 export default slice
 export const actions = slice.actions

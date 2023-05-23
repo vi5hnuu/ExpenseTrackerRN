@@ -1,12 +1,13 @@
-import { View, StyleSheet, Alert } from 'react-native'
+import { View, StyleSheet, Alert, ActivityIndicator } from 'react-native'
 import React, { useLayoutEffect, useState } from 'react'
 import Input from './Input'
 import Button from './Button'
 import IconButton from '../components/IconButton';
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { actions as expenseActions } from '../store/expensesSlice';
+import { actions as expenseActions, thunks } from '../store/expensesSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDate } from '../utils/utils'
+import Retry from './Retry';
 
 export default function ExpenseForm() {
   const route = useRoute()
@@ -61,8 +62,10 @@ export default function ExpenseForm() {
       Alert.alert('Invalid data', `Please enter a valid value :\nUsage : \n\tDate: YYYY-MM-DD and <=${getDate(new Date())}\n\tAmount: >0\n\tDescription: >0`, [{ style: 'destructive' }])
       return
     }
-    dispatch(expenseActions.addExpense({ description, date: new Date(date), amount: +amount }))
-    navigation.goBack();
+    dispatch(thunks.addExpenseThunk({ description, date: date, amount: +amount }))
+  }
+  function onRetryHandler() {
+    dispatch(thunks.addExpenseThunk({ description, date: date, amount: +amount }))
   }
   function expenseCancelHandler() {
     navigation.goBack();
@@ -98,13 +101,13 @@ export default function ExpenseForm() {
       label={'Description'} />
 
     <View style={styles.actions}>
-      <Button
+      {expenseSlice.pending ? <ActivityIndicator style={{ width: '50%' }} /> : expenseSlice.error ? <Retry onRetry={onRetryHandler} error={expenseSlice.error} /> : <Button
         style={{ backgroundColor: '#95d5b2' }}
         textStyle={{ fontWeight: 'bold' }}
         onPress={id ? expenseUpdateHandler : expenseAddHandler}
       >
         {id ? 'Update' : 'Add'}
-      </Button>
+      </Button>}
       <Button
         onPress={expenseCancelHandler}
         textStyle={{ color: '#f00', fontWeight: 'bold' }}

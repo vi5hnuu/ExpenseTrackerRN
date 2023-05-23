@@ -5,16 +5,14 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
 import { thunks } from '../store/expensesSlice';
 
-export default function Retry({ error }) {
+export default function Retry({ error, onRetry }) {
   const dispatch = useDispatch()
 
-  function onRetryHandler() {
-    dispatch(thunks.initilizeExpenses)
-  }
+
 
   return <View style={styles.container}>
     <Text style={styles.error}>{error}</Text>
-    <IconButton onPress={onRetryHandler} name='reload' size={24} color='#fff' />
+    <IconButton onPress={onRetry} name='reload' size={24} color='#fff' />
   </View>
 }
 

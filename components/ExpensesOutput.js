@@ -2,18 +2,23 @@ import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
 import ExpensesList from './ExpensesList'
 import ExpensesSummary from './ExpensesSummary'
 import Retry from './Retry'
+import { useDispatch } from 'react-redux'
+import { thunks } from '../store/expensesSlice'
 
 export default function ExpensesOutput({ isPending, isError,
   expenses,
   expensesPeriod, listHeading }) {
-
+  const dispatch = useDispatch()
+  function onRetryHandler() {
+    dispatch(thunks.initilizeExpenses)
+  }
   return <View style={styles.container}>
     <ExpensesSummary
       expenses={expenses}
       periodName={expensesPeriod} />
     <View style={styles.expensesContainer} >
       <Text style={styles.listHeading}>{listHeading}</Text>
-      {isPending ? <ActivityIndicator /> : isError ? <Retry error={isError} /> : <ExpensesList expenses={expenses} />}
+      {isPending ? <ActivityIndicator /> : isError ? <Retry onRetry={onRetryHandler} error={isError} /> : <ExpensesList expenses={expenses} />}
     </View>
   </View>
 }
